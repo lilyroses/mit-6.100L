@@ -14,5 +14,6 @@ def part_a(yearly_salary, portion_saved, cost_of_dream_home):
 	  amount_saved += ((yearly_salary/12) * portion_saved)
 	  if amount_saved >= portion_down_payment:
 	    break
+	
 	print(f"Number of months: {months}")
 	return months

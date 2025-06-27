@@ -1,6 +1,6 @@
 ## 6.100A PSet 1: Part B
-## Name:
-## Time Spent:
+## Name: Lily Stracke
+## Time Spent: 10 mins
 ## Collaborators:
 
 ##########################################################################################

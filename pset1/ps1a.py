@@ -27,4 +27,5 @@ while amount_saved < portion_down_payment:
   amount_saved += ((yearly_salary/12) * portion_saved)
   if amount_saved >= portion_down_payment:
     break
+
 print(f"Number of months: {months}")
