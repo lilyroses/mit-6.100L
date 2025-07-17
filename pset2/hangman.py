@@ -141,13 +141,23 @@ def hangman(secret_word, with_help):
 
     Follows the other limitations detailed in the problem write-up.
     """
-def hangman(secret_word, with_help):
 
     def reveal_letter(secret_word, available_letters):
-        choose_from = "".join([letter for letter in secret_word if letter in available_letters])
+        """
+        secret_word: string, the secret word to guess.
+        available_letters: string, comprised of letters that represents
+          which letters have not yet been guessed. The letters should
+          be in alphabetical order
+
+        returns: string, a single letter to help the user guess the word.
+        
+        Reveal a single letter that is in both the secret word and the available letters.
+        """
+        choose_from = "".join([letter for letter in available_letters if letter in secret_word])
         new = random.randint(0, len(choose_from)-1)
         revealed_letter = choose_from[new]
         return revealed_letter
+
 
     VOWELS = list("aeiou")
     
@@ -165,7 +175,12 @@ def hangman(secret_word, with_help):
     available_letters = get_available_letters(letters_guessed)
     word_progress = get_word_progress(secret_word, letters_guessed)
 
-    while num_guesses > 0:
+    while True:
+
+        if num_guesses <= 0:
+            print("-----------------")
+            print(f"Sorry, you ran out of guesses. The word was {secret_word}.")
+            break
 
         total_score = (num_guesses + (4 * num_unique_letters)) + (3 * n)
 
@@ -191,8 +206,13 @@ def hangman(secret_word, with_help):
                     num_guesses -= 3
                     print(f"Letter revealed: {revealed_letter}")
                     print(f"{word_progress}")
-                    continue
-                
+                    if has_player_won(secret_word, letters_guessed):
+                        print("-----------------")
+                        print("Congratulations, you won!")
+                        print(f"Your total score for this game is: {total_score}")
+                        break            
+                    else:
+                        continue
                 else:
                     print(f"Oops! Not enough guesses left: {word_progress}")
                     continue
@@ -219,10 +239,6 @@ def hangman(secret_word, with_help):
                     else:
                         num_guesses -= 1
 
-                    if num_guesses <= 0:
-                        print("-----------------")
-                        print(f"Sorry, you ran out of guesses. The word was {secret_word}.")
-                        break
 
                 # LETTER IN WORD
                 else:
@@ -232,7 +248,8 @@ def hangman(secret_word, with_help):
             print("-----------------")
             print("Congratulations, you won!")
             print(f"Your total score for this game is: {total_score}")
-            break              
+            break
+
 
 
 # When you've completed your hangman function, scroll down to the bottom
@@ -244,8 +261,8 @@ if __name__ == "__main__":
     secret_word = choose_word(wordlist)
 
     # ! NOTE ! DELETE LATER
-    secret_word = "tact"
-    with_help = False
+    with_help = True
+    secret_word = choose_word(wordlist)
     hangman(secret_word, with_help)
 
     # After you complete with_help functionality, change with_help to True
