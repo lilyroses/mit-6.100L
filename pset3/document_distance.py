@@ -60,9 +60,6 @@ def get_frequencies(input_iterable):
     """
     frequencies = dd(int)
     for item in input_iterable:
-        # if item not in frequencies:
-        #     frequencies[item] = 1
-        # else:
         frequencies[item] += 1
     return frequencies
 
@@ -122,7 +119,11 @@ def calculate_similarity_score(freq_dict1, freq_dict2):
         frequency_differences.append(z)
         frequency_totals.append(zz)
 
-    similarity = round(1 - ((sum(frequency_differences) / sum(frequency_totals))), 2)
+    a = sum(frequency_differences)
+    b = sum(frequency_totals)
+    c = a / b
+    similarity = 1 - c
+    similarity = round(similarity, 2)
     return similarity
     
 
@@ -157,9 +158,11 @@ def get_most_frequent_words(freq_dict1, freq_dict2):
 
     max_val = max(totals.values())
     most_frequent_words = []
+
     for word, val in totals.items():
         if val == max_val:
             most_frequent_words.append(word)
+    
     most_frequent_words = sorted(most_frequent_words)
     return most_frequent_words
 
@@ -176,7 +179,20 @@ def get_tf(file_path):
         in the document) / (total number of words in the document)
     * Think about how we can use get_frequencies from earlier
     """
-    pass
+    lines = load_file(file_path)
+    
+    words = text_to_list(lines)
+    total_num_words = len(words)
+ 
+    TFS = {}
+
+    frequencies = get_frequencies(words)
+    for word, num in frequencies.items():
+        TF = num / total_num_words
+        TFS[word] = TF
+
+    return TFS
+
 
 def get_idf(file_paths):
     """
@@ -190,7 +206,26 @@ def get_idf(file_paths):
     with math.log10()
 
     """
-    pass
+    total_num_documents = len(file_paths)
+    all_words = []
+    num_docs_with_word = dd(int)
+    IDFS = {}
+
+    for file_path in file_paths:
+        lines = load_file(file_path)
+        words = text_to_list(lines)
+        unique_words = set(words)
+        for unique_word in unique_words:
+            if unique_word not in all_words:
+                all_words.append(unique_word)
+            num_docs_with_word[unique_word] += 1
+    
+    for word in all_words:
+        IDF = math.log10(total_num_documents / num_docs_with_word[word])
+        IDFS[word] = IDF
+    
+    return IDFS
+    
 
 def get_tfidf(tf_file_path, idf_file_paths):
     """
@@ -205,11 +240,24 @@ def get_tfidf(tf_file_path, idf_file_paths):
 
         * TF-IDF(i) = TF(i) * IDF(i)
         """
-    pass
+    TFS = get_tf(tf_file_path)
+    IDFS = get_idf(idf_file_paths)
+    
+    all_words = [word for word in TFS.keys()]
+    
+    TF_IDFS = []
+
+    for word in all_words:
+        TF = TFS[word]
+        IDF = IDFS[word]
+        TF_IDF = TF * IDF
+        TF_IDFS.append((word, TF_IDF))
+    
+    TF_IDFS = sorted(TF_IDFS)
+    return TF_IDFS
 
 
 if __name__ == "__main__":
-    pass
     ###############################################################
     ## Uncomment the following lines to test your implementation ##
     ###############################################################
@@ -260,11 +308,11 @@ if __name__ == "__main__":
     print(most_frequent)      # should print ["hello", "world"]
 
     ## Tests Problem 5: Find TF-IDF
-    # tf_text_file = 'tests/student_tests/hello_world.txt'
-    # idf_text_files = ['tests/student_tests/hello_world.txt', 'tests/student_tests/hello_friends.txt']
-    # tf = get_tf(tf_text_file)
-    # idf = get_idf(idf_text_files)
-    # tf_idf = get_tfidf(tf_text_file, idf_text_files)
-    # print(tf)     # should print {'hello': 0.6666666666666666, 'world': 0.3333333333333333}
-    # print(idf)    # should print {'hello': 0.0, 'world': 0.3010299956639812, 'friends': 0.3010299956639812}
-    # print(tf_idf) # should print [('hello', 0.0), ('world', 0.10034333188799373)]
+    tf_text_file = 'tests/student_tests/hello_world.txt'
+    idf_text_files = ['tests/student_tests/hello_world.txt', 'tests/student_tests/hello_friends.txt']
+    tf = get_tf(tf_text_file)
+    idf = get_idf(idf_text_files)
+    tf_idf = get_tfidf(tf_text_file, idf_text_files)
+    print(tf)     # should print {'hello': 0.6666666666666666, 'world': 0.3333333333333333}
+    print(idf)    # should print {'hello': 0.0, 'world': 0.3010299956639812, 'friends': 0.3010299956639812}
+    print(tf_idf) # should print [('hello', 0.0), ('world', 0.10034333188799373)]
